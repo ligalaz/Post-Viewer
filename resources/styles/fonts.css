@@ -1,29 +1,23 @@
 @font-face {
-  font-family: "Oswald", sans-serif;
+  font-family: "Oswald";
   font-style: normal;
   src: url("../fonts/Basic/Oswald/static/Oswald-Regular.ttf");
 }
 
 @font-face {
-  font-family: "Signika", sans-serif;
+  font-family: "Signika";
   font-style: normal;
   src: url("../fonts/Posts/Signika/static/Signika-Regular.ttf");
 }
 
 @font-face {
-  font-family: "Bricolage Grotesque", sans-serif;
+  font-family: "Bricolage Grotesque";
   font-style: normal;
   src: url("../fonts/Title/Bricolage_Grotesque/static/BricolageGrotesque-Regular.ttf");
 }
 
 @font-face {
-  font-family: "Permanent Marker", cursive;
+  font-family: "Permanent Marker";
   font-style: normal;
   src: url("../fonts/Tags/Permanent_Marker/PermanentMarker-Regular.ttf");
-}
-
-@font-face {
-  font-family: "Dancing Script", cursive;
-  font-style: normal;
-  src: url("../fonts/Sign/Dancing_Script/static/DancingScript-Regular.ttf");
 }
