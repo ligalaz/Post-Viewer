@@ -5,16 +5,22 @@ import Const from "../consts/const.js";
 class Handler {
   constructor() {
     this.provider = new Provider();
-    this.storage = new Storage();
+    this.storage = new Storage(sessionStorage);
     this.postContainer = [];
     this.fullPostContainer = [];
   }
 
   async fillPostsContainer(skip = 0) {
     const data = await this.provider.getAllPosts(Const.selectPost, skip);
-    data.posts.forEach((item) => this.postContainer.push(this.editPost(item)));
+    const { limit, total } = data;
 
-    console.log(`post:`, this.postContainer);
+    this.storage.setItem(this.storage.keys.limit, limit);
+    this.storage.setItem(this.storage.keys.total, total);
+    this.postContainer = [];
+
+    data.posts.forEach((item) => this.postContainer.push(this.editPost(item)));
+    this.storage.setItem(this.storage.keys.postContainer, this.postContainer);
+
     return this.postContainer;
   }
 

@@ -1,16 +1,28 @@
 import Handler from "../Handler.js";
 import Provider from "../Provider.js";
 import Loader from "../Loader.js";
+import Storage from "../Storage.js";
+import postTemplate from "./Templates/post.js";
 
 class Pagination {
-  constructor(pagination, postRow) {
+  constructor(pagination, postRow, ...elems) {
     this.pagination = pagination;
     this.postRow = postRow;
-    this.count = 1;
-    this.border = 0;
+    this.onHideElements = [this.pagination, ...elems];
+
     this.handler = new Handler();
     this.provider = new Provider();
     this.loader = new Loader(this.postRow);
+    this.storage = new Storage(sessionStorage);
+
+    this.limit = Number(this.storage.getItem(this.storage.keys.limit));
+    this.total = Number(this.storage.getItem(this.storage.keys.total));
+    this.border = Math.ceil(this.total / this.limit);
+    this.count = 1;
+
+    this.buttonBlocked = `pagination_blocked`;
+    this.buttonActive = `pagination_active`;
+    this.onHide = `unvisible`;
   }
 
   render() {
@@ -22,66 +34,110 @@ class Pagination {
             <p>></p>
           </div>`;
   }
+
   initHosts() {
-    this.counter = this.pagination.querySelector(`.pagination_current`);
     this.turnRight = this.pagination.querySelector(`.pagination_right`);
     this.turnLeft = this.pagination.querySelector(`.pagination_left`);
   }
-  initListeners() {
-    this.turnRight.addEventListener(`click`, async () => {
-      if (!this.border) {
-        const { total, limit } = await this.provider.getAllPosts();
-        this.border = total / limit;
-      }
 
-      if (this.count < this.border) {
-        this.count++;
-        this.counter.textContent = `${this.count}`;
-        this.nextPost(this.count);
-        this.turnLeft.classList.remove(`pagination_blocked`);
-        this.turnLeft.classList.add(`pagination_active`);
+  initProviders() {
+    this.counter = this.pagination.querySelector(`.pagination_current`);
+  }
+
+  initListeners() {
+    this.turnRight.addEventListener(`click`, async (e) => {
+      const nextSkip = this.count + (this.limit - 1) * this.count;
+      if (this.count === 1) {
+        this.drawPost(nextSkip);
+        this.changeCounter(true);
+        this.blockedHost(e, false);
+      } else if (this.count < this.border - 1 && this.count > 1) {
+        this.drawPost(nextSkip);
+        this.changeCounter(true);
+      } else if (this.count == this.border - 1 && this.count > 1) {
+        this.drawPost(nextSkip);
+        this.changeCounter(true);
+        this.blockedHost(e, true);
+      } else {
+        return;
       }
-      if (this.count === this.border) {
-        this.turnRight.classList.add(`pagination_blocked`);
+    });
+
+    this.turnLeft.addEventListener(`click`, async (e) => {
+      const prevSkip = (this.count - 1) * this.limit - this.limit;
+      if (this.count > 1 && this.count < this.border) {
+        this.drawPost(prevSkip);
+        this.changeCounter(false);
+      }
+      if (this.count == 1) {
+        this.blockedHost(e, true);
+        return;
+      }
+      if (this.count == 5) {
+        this.drawPost(prevSkip);
+        this.changeCounter(false);
+        this.blockedHost(e, false);
       }
     });
   }
 
-  async nextPost(skip) {
+  async drawPost(skip) {
+    let newPostList = await this.beforeLoading(skip);
+    this.postRow.innerHTML = postTemplate(newPostList);
+  }
+
+  async beforeLoading(skip) {
     let postList = ``;
+
     if (!postList) {
+      this.hideElements(true, this.onHideElements);
       this.loader.initialize();
     }
-    postList = await this.handler.fillPostsContainer(skip);
-    this.postRow.innerHTML = `${postList.map(
-      (
-        item,
-        idx,
-      ) => `<div id=${item.id} userId=${item.userId} class="post main__post">
-            <div class="title__container">
-              <p class="title post__title">${item.title}</p>
-            </div>
-            <p class="text post__text">${item.editBody}
 
-            </p>
-            <div class="info post_info">
-              <div class="spectators post__spectators">
-                <div class="spectators__logo">
-                  <img
-                    src="./resources/icons/settings/monitor.png"
-                    alt="spectators"
-                  />
-                </div>
-                <div class="spectators__number">${item.reactions}</div>
-              </div>
-              <div class="author post__author">userId№  ${item.userId}</div>
-            </div>
-          </div>`,
-    ).join``}`;
+    postList = await this.handler.fillPostsContainer(skip);
+    this.hideElements(false, this.onHideElements);
+
+    return postList;
+  }
+
+  blockedHost(e, flag) {
+    if (flag) {
+      e.currentTarget.classList.add(this.buttonBlocked);
+      e.currentTarget.classList.remove(this.buttonActive);
+    }
+
+    switch (e.currentTarget) {
+      case this.turnRight:
+        if (!flag) {
+          this.turnLeft.classList.remove(this.buttonBlocked);
+          this.turnLeft.classList.add(this.buttonActive);
+        }
+        break;
+      case this.turnLeft:
+        if (!flag) {
+          this.turnRight.classList.remove(this.buttonBlocked);
+          this.turnRight.classList.add(this.buttonActive);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  changeCounter(flag) {
+    !flag ? this.count-- : this.count++;
+    this.counter.textContent = `${this.count}`;
+  }
+
+  hideElements(flag, elements) {
+    flag
+      ? elements.forEach((item) => item.classList.add(this.onHide))
+      : elements.forEach((item) => item.classList.remove(this.onHide));
   }
 
   initialize() {
     this.render();
+    this.initProviders();
     this.initHosts();
     this.initListeners();
   }

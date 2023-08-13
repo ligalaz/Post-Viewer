@@ -27,7 +27,7 @@ class StartApp {
       }
 
       test = await this.handler.fillPostsContainer();
-      console.log(test);
+
       this.view = new View(this.app, test);
       this.view.initialize();
     });

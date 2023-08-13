@@ -818,3 +818,7 @@ hr {
     opacity: 1;
   }
 }
+
+.unvisible {
+  opacity: 0;
+}
