@@ -1,3 +1,4 @@
+import Storage from "./Services/Storage.js";
 import Handler from "./Services/Handler.js";
 import Loader from "./Loader.js";
 import View from "./View/View.js";
@@ -7,6 +8,7 @@ class StartApp {
     this.app = app;
     this.handler = new Handler();
     this.loader = new Loader(this.app);
+    this.storage = new Storage(sessionStorage);
   }
 
   render() {
@@ -24,11 +26,13 @@ class StartApp {
   initListeners() {
     this.startBtn.addEventListener(`click`, async () => {
       let loadingData = ``;
+
       if (!loadingData) {
         this.loader.initialize();
       }
-
-      loadingData = await this.handler.fillPostsContainer();
+      loadingData = this.storage.getItem(this.storage.keys.postContainer)
+        ? this.storage.getItem(this.storage.keys.postContainer)
+        : await this.handler.fillPostsContainer();
 
       this.view = new View(this.app, loadingData);
       this.view.initialize();

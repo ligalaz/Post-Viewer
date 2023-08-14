@@ -67,7 +67,7 @@ class View {
       if (!target) {
         return;
       }
-      this.showModal(target.id);
+      this.drawModal(target.id);
     });
   }
 
@@ -80,13 +80,23 @@ class View {
 
     this.initModule(Footer, footer);
     this.initModule(Pagination, pagination, postRow, footer, header);
-    this.initModule(Search, search, this.postContainer, postRow);
+    this.initModule(Search, search, postRow);
   }
 
-  async showModal(postId) {
-    const post = await this.handler.fillFullPostContainer(postId);
+  async drawModal(postId) {
+    let currentFullPosts =
+      this.storage.getItem(this.storage.keys.fullPostContainer) || [];
+
+    currentFullPosts = currentFullPosts
+      .map((item) => (item.id == postId ? item : ``))
+      .filter((item) => item !== ``);
+
+    const post = currentFullPosts.length
+      ? currentFullPosts
+      : await this.handler.fillFullPostContainer(postId);
+
     this.modal.classList.add(`modal_show`);
-    this.modalWindow = new Modal(this.modal, post[0]);
+    this.modalWindow = new Modal(this.modal, post[post.length - 1], this.posts);
     this.modalWindow.initialize();
   }
 

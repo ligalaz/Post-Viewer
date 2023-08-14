@@ -1,9 +1,7 @@
 import Const from "../../consts/const.js";
 
 class Searcher {
-  constructor(structureForSearch = []) {
-    this.structureForSearch = structureForSearch;
-  }
+  constructor() {}
 
   searchByField(text, field, array) {
     text = text.toLowerCase();
@@ -18,9 +16,14 @@ class Searcher {
   }
 
   runSearch(text, array) {
-    let fields = array.length ? this.getFields(this.structureForSearch[0]) : [];
+    let fields = array.length ? this.getFields(array[0]) : [];
 
-    fields = this.withoutFields(true, fields, Const.postModel.id);
+    fields = this.withoutFields(
+      true,
+      fields,
+      Const.postModel.id,
+      Const.postModel.body,
+    );
 
     let searchPack = fields.length
       ? fields

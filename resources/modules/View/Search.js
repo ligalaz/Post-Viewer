@@ -1,13 +1,14 @@
 import Searcher from "../Services/Searcher.js";
+import Storage from "../Services/Storage.js";
 import postTemplate from "./Templates/post.js";
 
 class Search {
-  constructor(search, searchData, target) {
+  constructor(search, target) {
     this.search = search;
-    this.searchData = searchData;
     this.target = target;
 
-    this.searcher = new Searcher(this.searchData);
+    this.storage = new Storage(sessionStorage);
+    this.searcher = new Searcher();
   }
 
   render() {
@@ -45,8 +46,9 @@ class Search {
 
   startSearch() {
     const searchValue = this.searchField.value;
-    console.log(this);
-    return this.searcher.runSearch(searchValue, this.searchData);
+    const searchData = this.storage.getItem(this.storage.keys.postContainer);
+
+    return this.searcher.runSearch(searchValue, searchData);
   }
 
   initialize() {

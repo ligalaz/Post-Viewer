@@ -19,13 +19,15 @@ class Handler {
     this.storage.setItem(this.storage.keys.total, total);
     this.postContainer = [];
 
-    data.posts.forEach((item) => this.postContainer.push(this.editPost(item)));
+    data.posts.forEach((item) =>
+      this.postContainer.push(this.editPostBody(item)),
+    );
     this.storage.setItem(this.storage.keys.postContainer, this.postContainer);
 
     return this.postContainer;
   }
 
-  async fillFullPostContainer(postId, mode) {
+  async fillFullPostContainer(postId) {
     let data = await this.provider.getPost(postId);
 
     const { id, title, body, tags, reactions, userId } = data;
@@ -67,7 +69,6 @@ class Handler {
   async fillCommentsContainer(postId) {
     const data = await this.provider.getComments(postId);
     const { comments } = data;
-    // this.commentsContainer = [];
 
     this.commentsContainer = comments.map((item) => {
       return {
@@ -78,11 +79,44 @@ class Handler {
     return this.commentsContainer;
   }
 
-  editPost(post) {
+  async updateContainers(postId, options) {
+    const data = await this.provider.editPost(postId, options);
+    const post = this.editPostBody(data);
+    let fullPostContainer = this.storage.getItem(
+      this.storage.keys.fullPostContainer,
+    );
+
+    let postContainer = this.storage.getItem(this.storage.keys.postContainer);
+
+    this.storage.setItem(
+      this.storage.keys.fullPostContainer,
+      this.editContainer(post, fullPostContainer),
+    );
+    this.storage.setItem(
+      this.storage.keys.postContainer,
+      this.editContainer(post, postContainer),
+    );
+
+    return this.editContainer(post, postContainer);
+  }
+
+  editContainer(model, container) {
+    return container.map((item) => {
+      if (item.id == model.id) {
+        item.title = model.title.trim();
+        item.body = model.body.trim();
+        item.editBody = model.editBody.trim();
+        return item;
+      }
+      return item;
+    });
+  }
+
+  editPostBody(post) {
     const { id, title, body, reactions, userId } = post;
     const editBody = this.filteredPostBody(body);
 
-    return { id, title, editBody, reactions, userId };
+    return { id, title, body, editBody, reactions, userId };
   }
 
   filteredPostBody(body) {

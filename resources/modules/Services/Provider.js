@@ -29,8 +29,11 @@ class Provider {
     );
   }
 
-  async editPost(postId, options) {
-    return this.sendRequest(`${this.src}/${postId}`, options);
+  async editPost(postId, options, select = ``, skip = ``) {
+    return this.sendRequest(
+      this.createSrc(Const.routes.posts, postId, select, skip),
+      options,
+    );
   }
 
   async sendRequest(src, options = ``) {
@@ -41,12 +44,10 @@ class Provider {
       response = await fetch(src);
       data = await response.json();
     } else {
-      response = await fetch(this.src, {
-        method: `POST`,
-        headers: {
-          "Content-Type": `application/json`,
-        },
-        body: options,
+      response = await fetch(src, {
+        method: `PATCH`,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(options),
       });
       data = await response.json();
     }

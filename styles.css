@@ -549,7 +549,7 @@ hr {
   display: block;
 
   width: 80%;
-  border: none;
+  border: 2px solid transparent;
 
   font-size: 1.56rem;
   text-align: center;
@@ -590,7 +590,7 @@ hr {
   padding-top: 0;
   line-height: 25px;
 
-  border: none;
+  border: 2px solid transparent;
 
   font-size: 1rem;
   font-family: var(--post_font);
@@ -602,6 +602,11 @@ hr {
 .content__text:focus,
 .content__text:active {
   outline: none;
+}
+
+.content_editMode {
+  border: 2px solid var(--search-border_color);
+  background: transparent;
 }
 
 .content__tags {
