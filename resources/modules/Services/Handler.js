@@ -82,7 +82,7 @@ class Handler {
     const { id, title, body, reactions, userId } = post;
     const editBody = this.filteredPostBody(body);
 
-    return { id, title, body, editBody, reactions, userId };
+    return { id, title, editBody, reactions, userId };
   }
 
   filteredPostBody(body) {

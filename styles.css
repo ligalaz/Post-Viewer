@@ -149,6 +149,10 @@
   border: 3px solid var(--search-border_color);
 }
 
+.search__btn {
+  cursor: pointer;
+}
+
 .main {
   display: flex;
   flex-direction: column;
