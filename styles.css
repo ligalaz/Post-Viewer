@@ -403,6 +403,7 @@
 
   display: flex;
   display: none;
+  justify-content: center;
   top: 0;
   right: 0;
   bottom: 0;
@@ -411,9 +412,10 @@
   padding: 30px;
 
   background: var(--bg-modal_color);
-  /* z-index: -3; */
 
   overflow-y: auto;
+
+  cursor: pointer;
 }
 
 .modal__close {
@@ -462,8 +464,6 @@
   width: 50%;
   padding: 20px;
   margin: auto;
-  /* min-height: 500px; */
-  /* height: auto; */
 
   border-radius: 10px;
   -webkit-border-radius: 10px;
@@ -821,4 +821,15 @@ hr {
 
 .unvisible {
   opacity: 0;
+}
+
+.modal_show {
+  display: flex;
+}
+.comment_hide {
+  display: none;
+}
+
+.test {
+  background: red;
 }

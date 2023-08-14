@@ -1,6 +1,6 @@
 import Provider from "./Provider.js";
 import Storage from "./Storage.js";
-import Const from "../consts/const.js";
+import Const from "../../consts/const.js";
 
 class Handler {
   constructor() {
@@ -8,6 +8,7 @@ class Handler {
     this.storage = new Storage(sessionStorage);
     this.postContainer = [];
     this.fullPostContainer = [];
+    this.commentsContainer = [];
   }
 
   async fillPostsContainer(skip = 0) {
@@ -24,7 +25,7 @@ class Handler {
     return this.postContainer;
   }
 
-  async fillFullPostContainer(postId) {
+  async fillFullPostContainer(postId, mode) {
     let data = await this.provider.getPost(postId);
 
     const { id, title, body, tags, reactions, userId } = data;
@@ -32,8 +33,7 @@ class Handler {
     data = await this.provider.getUser(userId);
 
     const { firstName, lastName, maidenName, company } = data;
-
-    this.fullPostContainer.push({
+    const fullModel = {
       id,
       title,
       body,
@@ -44,9 +44,38 @@ class Handler {
       lastName,
       maidenName,
       company,
-    });
+    };
+
+    if (this.storage.getItem(this.storage.keys.fullPostContainer)) {
+      const posts = this.storage.getItem(this.storage.keys.fullPostContainer);
+      posts.findIndex((item) => item.id == id) === -1
+        ? posts.push(fullModel)
+        : null;
+      posts.sort((a, b) => (a.id > b.id ? 1 : -1));
+      this.storage.setItem(this.storage.keys.fullPostContainer, posts);
+    } else {
+      this.storage.setItem(this.storage.keys.fullPostContainer, [fullModel]);
+    }
+
+    this.fullPostContainer = [];
+
+    this.fullPostContainer.push(fullModel);
 
     return this.fullPostContainer;
+  }
+
+  async fillCommentsContainer(postId) {
+    const data = await this.provider.getComments(postId);
+    const { comments } = data;
+    // this.commentsContainer = [];
+
+    this.commentsContainer = comments.map((item) => {
+      return {
+        body: item.body,
+        username: item.user.username,
+      };
+    });
+    return this.commentsContainer;
   }
 
   editPost(post) {

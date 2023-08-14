@@ -1,6 +1,6 @@
-import Handler from "./Handler.js";
+import Handler from "./Services/Handler.js";
 import Loader from "./Loader.js";
-import View from "./View.js";
+import View from "./View/View.js";
 
 class StartApp {
   constructor(app) {
@@ -16,19 +16,21 @@ class StartApp {
                             </div>
                         </div>`;
   }
+
   initHosts() {
     this.startBtn = this.app.querySelector(".start-btn");
   }
+
   initListeners() {
     this.startBtn.addEventListener(`click`, async () => {
-      let test = ``;
-      if (!test) {
+      let loadingData = ``;
+      if (!loadingData) {
         this.loader.initialize();
       }
 
-      test = await this.handler.fillPostsContainer();
+      loadingData = await this.handler.fillPostsContainer();
 
-      this.view = new View(this.app, test);
+      this.view = new View(this.app, loadingData);
       this.view.initialize();
     });
   }

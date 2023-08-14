@@ -1,7 +1,7 @@
-import Handler from "../Handler.js";
-import Provider from "../Provider.js";
+import Handler from "../Services/Handler.js";
+import Provider from "../Services/Provider.js";
 import Loader from "../Loader.js";
-import Storage from "../Storage.js";
+import Storage from "../Services/Storage.js";
 import postTemplate from "./Templates/post.js";
 
 class Pagination {

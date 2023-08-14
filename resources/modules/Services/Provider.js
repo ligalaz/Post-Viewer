@@ -1,4 +1,4 @@
-import Const from "../consts/const.js";
+import Const from "../../consts/const.js";
 
 class Provider {
   constructor(src = "") {
@@ -15,7 +15,7 @@ class Provider {
       `${this.createSrc(Const.routes.users, userId, select, skip)}`,
     );
   }
-  async getComments(postId) {
+  async getComments(postId, select = ``, skip = ``) {
     return await this.sendRequest(
       `${this.createSrc(Const.routes.posts, postId, select, skip)}/${
         Const.routes.comments

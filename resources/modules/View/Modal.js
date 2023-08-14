@@ -1,6 +1,16 @@
+import Handler from "../Services/Handler.js";
+import Comments from "./Comments.js";
+import Storage from "../Services/Storage.js";
+import Loader from "../Loader.js";
+
 class Modal {
-  constructor(modal) {
+  constructor(modal, fullPostModel) {
     this.modal = modal;
+    this.fullPostModel = fullPostModel;
+    this.handler = new Handler();
+    this.storage = new Storage(sessionStorage);
+    this.loader = new Loader(this.modal);
+    this.isLoading = true;
   }
 
   render() {
@@ -63,15 +73,19 @@ class Modal {
               <input
                 type="text"
                 class="modal__title_text"
-                value="title title title title title "
-                maxlength="30"
+                value="${this.fullPostModel.title}"
+                maxlength="50"
                 disabled
               />
             </div>
             <div class="author modal__author">
-              <div class="author__name">John Doe</div>
-              <div class="author__job">Frontend</div>
-              <div class="author__bureau">IBM New-York Department</div>
+              <div class="author__name">${this.fullPostModel.firstName} "${
+      this.fullPostModel.maidenName
+    }" ${this.fullPostModel.lastName}</div>
+              <div class="author__job">${this.fullPostModel.company.title}</div>
+              <div class="author__bureau">${
+                this.fullPostModel.company.department
+              }</div>
               <hr />
             </div>
 
@@ -80,50 +94,28 @@ class Modal {
               <textarea
                 class="content__text"
                 name=""
-                id=""
+                id="#${this.fullPostModel.company.postId}"
                 cols="1"
                 rows="6"
                 wrap="soft"
                 style="resize: none"
                 disabled
               >
-              Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-              Perspiciatis, voluptate quibusdam doloribus veniam animi labore
-              quidem explicabo odit deleniti ea soluta repudiandae quam dolorum
-              omnis, sint amet. Repellendus, consequatur mollitia. Lorem ipsum
-              dolor sit amet consectetur adipisicing elit. Enim exercitationem
-              dolorum delectus mollitia aut impedit illum totam architecto
-              maiores asperiores fugiat esse perspiciatis, et facere ducimus
-              necessitatibus. Laboriosam, atque molestiae.</textarea
-              >
+             ${this.fullPostModel.body}
+               </textarea>
 
-              <p class="content__tags">#Lorem, #ipsum, #dolor</p>
+              <p class="content__tags">#${this.fullPostModel.tags
+                .map((item) => item)
+                .join(` #`)}</p>
               <hr />
             </div>
 
-            <div class="comments modal__comments">
-              <div class="comments__show">Show comments</div>
+            <div class="comments modal__comments" >
+              <div class="comments__show" postId="${
+                this.fullPostModel.id
+              }">Show comments</div>
               <div class="comments__row">
-                <div class="comments__item">
-                  <div class="comments__text">Lorem ipsum dolor s</div>
-                  <div class="comments__author">John Smith</div>
-                </div>
-                <div class="comments__item">
-                  <div class="comments__text">Lorem ipsum dolor s</div>
-                  <div class="comments__author">John Smith</div>
-                </div>
-                <div class="comments__item">
-                  <div class="comments__text">Lorem ipsum dolor s</div>
-                  <div class="comments__author">John Smith</div>
-                </div>
-                <div class="comments__item">
-                  <div class="comments__text">Lorem ipsum dolor s</div>
-                  <div class="comments__author">John Smith</div>
-                </div>
-                <div class="comments__item">
-                  <div class="comments__text">Lorem ipsum dolor s</div>
-                  <div class="comments__author">John Smith</div>
-                </div>
+      
               </div>
               <hr />
             </div>
@@ -134,8 +126,111 @@ class Modal {
           </div>`;
   }
 
+  initHosts() {
+    this.showComments = this.modal.querySelector(`.comments__show`);
+    this.commentsRow = this.modal.querySelector(`.comments__row`);
+    this.closeBtn = this.modal.querySelector(`.close`);
+    this.sliderRight = this.modal.querySelector(`.modal__slider_right`);
+    this.sliderLeft = this.modal.querySelector(`.modal__slider_left`);
+  }
+
+  initListeners() {
+    this.showComments.addEventListener(`click`, async (e) => {
+      const postId = e.currentTarget.getAttribute(`postId`);
+      if (!this.commentsRow.classList.contains(`comments_visible`)) {
+        const comments = await this.handler.fillCommentsContainer(postId);
+        this.drawComments(comments);
+      } else {
+        this.hideComments();
+      }
+    });
+
+    this.closeBtn.addEventListener(`click`, (e) => {
+      this.hideModal(e);
+    });
+
+    this.sliderRight.addEventListener(`click`, () => {
+      this.changePost(true);
+    });
+    this.sliderLeft.addEventListener(`click`, () => {
+      this.changePost(false);
+    });
+  }
+
+  drawComments(comments) {
+    this.comments = new Comments(this.commentsRow, comments);
+    this.comments.initialize();
+    this.commentsRow.classList.add(`comments_visible`);
+  }
+
+  hideComments() {
+    const comments = Array.from(this.commentsRow.children);
+    if (this.commentsRow.classList.contains(`comments_visible`)) {
+      comments.forEach((comment) => comment.classList.add(`comment_hide`));
+      this.commentsRow.classList.remove(`comments_visible`);
+    }
+  }
+
+  hideModal(e) {
+    if (this.isLoading) {
+      e.currentTarget === this.closeBtn
+        ? this.modal.classList.remove(`modal_show`)
+        : null;
+    } else return;
+  }
+
+  async changePost(isNext) {
+    this.isLoading = false;
+    const currentId = this.fullPostModel.id;
+    const currentPostContainer = this.storage.getItem(
+      this.storage.keys.postContainer,
+    );
+    const currentFullPostContainer = this.storage.getItem(
+      this.storage.keys.fullPostContainer,
+    );
+
+    const currentIndex = currentPostContainer.findIndex(
+      (post) => post.id == currentId,
+    );
+
+    let changeId;
+
+    if (isNext) {
+      try {
+        changeId = currentPostContainer[currentIndex + 1].id;
+      } catch {
+        changeId = currentPostContainer[0].id;
+      }
+    } else {
+      try {
+        changeId = currentPostContainer[currentIndex - 1].id;
+      } catch {
+        changeId = currentPostContainer[currentPostContainer.length - 1].id;
+      }
+    }
+
+    const changeIndex = currentFullPostContainer.findIndex(
+      (item) => item.id == changeId,
+    );
+
+    if (!this.isLoading) {
+      this.loader.initialize();
+    }
+
+    const post =
+      changeIndex == -1
+        ? await this.handler.fillFullPostContainer(changeId)
+        : [currentFullPostContainer[changeIndex]];
+    this.isLoading = true;
+
+    this.fullPostModel = post[0];
+    this.initialize();
+  }
+
   initialize() {
     this.render();
+    this.initHosts();
+    this.initListeners();
   }
 }
 

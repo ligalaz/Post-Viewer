@@ -7,8 +7,11 @@ const Const = {
   },
   selectPost: `userId,title,body,reactions`,
   selectUser: `firstName,maidenName,lastName,company`,
-  endSkip: 5,
   postSymbolLimit: 100,
+  commentModel: {
+    body: `body`,
+    username: `username`,
+  },
 };
 
 export default Const;

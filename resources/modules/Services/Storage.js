@@ -16,6 +16,7 @@ class Storage {
 
   getItem(key) {
     const value = this.storage.getItem(key);
+
     try {
       return JSON.parse(value);
     } catch {
