@@ -1,8 +1,8 @@
-import Handler from "../Services/Handler.js";
-import Provider from "../Services/Provider.js";
-import Loader from "../Loader.js";
-import Storage from "../Services/Storage.js";
-import postTemplate from "./Templates/post.js";
+import Handler from "../../Services/Handler.js";
+import Provider from "../../Services/Provider.js";
+import Loader from "../Other/Loader.js";
+import Storage from "../../Services/Storage.js";
+import postTemplate from "../Templates/post.js";
 
 class Pagination {
   constructor(pagination, postRow, ...elems) {
@@ -18,7 +18,8 @@ class Pagination {
     this.limit = Number(this.storage.getItem(this.storage.keys.limit));
     this.total = Number(this.storage.getItem(this.storage.keys.total));
     this.border = Math.ceil(this.total / this.limit);
-    this.count = 1;
+    this.count =
+      Number(this.storage.getItem(this.storage.keys.pageNumber)) || 1;
 
     this.buttonBlocked = `pagination_blocked`;
     this.buttonActive = `pagination_active`;
@@ -26,13 +27,30 @@ class Pagination {
   }
 
   render() {
-    this.pagination.innerHTML = `<div class="pagination__item pagination_left pagination_blocked">
+    this.pagination.innerHTML = `${
+      this.count == 1
+        ? `<div class="pagination__item pagination_left pagination_blocked">
             <p><</p>
-          </div>
-          <div class="pagination__item pagination_current"><p>1</p></div>
-          <div class="pagination__item pagination_right pagination_active">
+          </div>`
+        : `<div class="pagination__item pagination_left pagination_active">
+            <p><</p>
+          </div>`
+    }
+          ${
+            this.count == 1
+              ? `<div class="pagination__item pagination_current"><p>1</p></div>`
+              : `<div class="pagination__item pagination_current"><p>${this.count}</p></div>`
+          }
+          ${
+            this.count == 5
+              ? `<div class="pagination__item pagination_right  pagination_blocked">
             <p>></p>
-          </div>`;
+          </div>`
+              : `<div class="pagination__item pagination_right pagination_active">
+            <p>></p>
+          </div>`
+          }
+          `;
   }
 
   initHosts() {
@@ -51,13 +69,16 @@ class Pagination {
         this.drawPost(nextSkip);
         this.changeCounter(true);
         this.blockedHost(e, false);
+        this.storage.setItem(this.storage.keys.pageNumber, this.count);
       } else if (this.count < this.border - 1 && this.count > 1) {
         this.drawPost(nextSkip);
         this.changeCounter(true);
+        this.storage.setItem(this.storage.keys.pageNumber, this.count);
       } else if (this.count == this.border - 1 && this.count > 1) {
         this.drawPost(nextSkip);
         this.changeCounter(true);
         this.blockedHost(e, true);
+        this.storage.setItem(this.storage.keys.pageNumber, this.count);
       } else {
         return;
       }
@@ -68,6 +89,7 @@ class Pagination {
       if (this.count > 1 && this.count < this.border) {
         this.drawPost(prevSkip);
         this.changeCounter(false);
+        this.storage.setItem(this.storage.keys.pageNumber, this.count);
       }
       if (this.count == 1) {
         this.blockedHost(e, true);
@@ -77,12 +99,14 @@ class Pagination {
         this.drawPost(prevSkip);
         this.changeCounter(false);
         this.blockedHost(e, false);
+        this.storage.setItem(this.storage.keys.pageNumber, this.count);
       }
     });
   }
 
   async drawPost(skip) {
     let newPostList = await this.beforeLoading(skip);
+
     this.postRow.innerHTML = postTemplate(newPostList);
   }
 

@@ -1,15 +1,15 @@
-import Handler from "../Services/Handler.js";
+import Handler from "../../Services/Handler.js";
 import Comments from "./Comments.js";
-import Storage from "../Services/Storage.js";
-import Loader from "../Loader.js";
+import Storage from "../../Services/Storage.js";
+import Loader from "../Other/Loader.js";
 import ModalSettings from "./ModalSettings.js";
-import postTemplate from "./Templates/post.js";
+import postTemplate from "../Templates/post.js";
 
 class Modal {
   constructor(modal, fullPostModel, targetView) {
     this.modal = modal;
     this.fullPostModel = fullPostModel;
-    console.log(this.fullPostModel);
+
     this.targetView = targetView;
     this.handler = new Handler();
     this.storage = new Storage(sessionStorage);
@@ -20,7 +20,7 @@ class Modal {
   render() {
     this.modal.innerHTML = `<div class="modal__body">
             <div class="close modal__close">
-              <svg
+              <svg class="close__item"
                 fill="#00FFFF"
                 width="25px"
                 height="25px"
@@ -144,6 +144,8 @@ class Modal {
       this.fullPostModel.id,
       titleTarget,
       bodyTarget,
+      this.modal.querySelector(`.modal__slider_right`),
+      this.modal.querySelector(`.modal__slider_left`),
     );
   }
 
@@ -170,51 +172,56 @@ class Modal {
   }
 
   async changePost(isNext) {
-    this.isLoading = false;
-    const currentId = this.fullPostModel.id;
-    const currentPostContainer = this.storage.getItem(
-      this.storage.keys.postContainer,
-    );
-    const currentFullPostContainer = this.storage.getItem(
-      this.storage.keys.fullPostContainer,
-    );
+    if (
+      !this.sliderRight.classList.contains(`slider__item_blocked`) &&
+      !this.sliderLeft.classList.contains(`slider__item_blocked`)
+    ) {
+      this.isLoading = false;
+      const currentId = this.fullPostModel.id;
+      const currentPostContainer = this.storage.getItem(
+        this.storage.keys.postContainer,
+      );
+      const currentFullPostContainer = this.storage.getItem(
+        this.storage.keys.fullPostContainer,
+      );
 
-    const currentIndex = currentPostContainer.findIndex(
-      (post) => post.id == currentId,
-    );
+      const currentIndex = currentPostContainer.findIndex(
+        (post) => post.id == currentId,
+      );
 
-    let changeId;
+      let changeId;
 
-    if (isNext) {
-      try {
-        changeId = currentPostContainer[currentIndex + 1].id;
-      } catch {
-        changeId = currentPostContainer[0].id;
+      if (isNext) {
+        try {
+          changeId = currentPostContainer[currentIndex + 1].id;
+        } catch {
+          changeId = currentPostContainer[0].id;
+        }
+      } else {
+        try {
+          changeId = currentPostContainer[currentIndex - 1].id;
+        } catch {
+          changeId = currentPostContainer[currentPostContainer.length - 1].id;
+        }
       }
-    } else {
-      try {
-        changeId = currentPostContainer[currentIndex - 1].id;
-      } catch {
-        changeId = currentPostContainer[currentPostContainer.length - 1].id;
+
+      const changeIndex = currentFullPostContainer.findIndex(
+        (item) => item.id == changeId,
+      );
+
+      if (!this.isLoading) {
+        this.loader.initialize();
       }
+
+      const post =
+        changeIndex == -1
+          ? await this.handler.fillFullPostContainer(changeId)
+          : [currentFullPostContainer[changeIndex]];
+      this.isLoading = true;
+
+      this.fullPostModel = post[0];
+      this.initialize();
     }
-
-    const changeIndex = currentFullPostContainer.findIndex(
-      (item) => item.id == changeId,
-    );
-
-    if (!this.isLoading) {
-      this.loader.initialize();
-    }
-
-    const post =
-      changeIndex == -1
-        ? await this.handler.fillFullPostContainer(changeId)
-        : [currentFullPostContainer[changeIndex]];
-    this.isLoading = true;
-
-    this.fullPostModel = post[0];
-    this.initialize();
   }
 
   initialize() {

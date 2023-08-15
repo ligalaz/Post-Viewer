@@ -1,7 +1,7 @@
 import Storage from "./Services/Storage.js";
 import Handler from "./Services/Handler.js";
-import Loader from "./Loader.js";
-import View from "./View/View.js";
+import Loader from "./View/Other/Loader.js";
+import View from "./View/Main/View.js";
 
 class StartApp {
   constructor(app) {
@@ -12,7 +12,7 @@ class StartApp {
   }
 
   render() {
-    this.app.innerHTML = `<div class="container app__container">
+    this.app.innerHTML = `<div class="container app__container app__container_center">
                             <div class="start-btn main__start">
                              <p class="start-btn__text">View Posts</p>
                             </div>

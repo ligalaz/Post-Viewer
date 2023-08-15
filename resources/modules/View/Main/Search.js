@@ -1,6 +1,6 @@
-import Searcher from "../Services/Searcher.js";
-import Storage from "../Services/Storage.js";
-import postTemplate from "./Templates/post.js";
+import Searcher from "../../Services/Searcher.js";
+import Storage from "../../Services/Storage.js";
+import postTemplate from "../Templates/post.js";
 
 class Search {
   constructor(search, target) {

@@ -1,10 +1,10 @@
-import Handler from "../Services/Handler.js";
-import Modal from "./Modal.js";
-import Footer from "./Other/Footer.js";
+import Handler from "../../Services/Handler.js";
+import Modal from "../Modal/Modal.js";
+import Footer from "../Other/Footer.js";
 
 import Pagination from "./Pagination.js";
-import postTemplate from "./Templates/post.js";
-import Storage from "../Services/Storage.js";
+import postTemplate from "../Templates/post.js";
+import Storage from "../../Services/Storage.js";
 import Search from "./Search.js";
 
 class View {
@@ -91,6 +91,8 @@ class View {
       .map((item) => (item.id == postId ? item : ``))
       .filter((item) => item !== ``);
 
+    this.truePostBeforepagination(currentFullPosts);
+
     const post = currentFullPosts.length
       ? currentFullPosts
       : await this.handler.fillFullPostContainer(postId);
@@ -98,6 +100,36 @@ class View {
     this.modal.classList.add(`modal_show`);
     this.modalWindow = new Modal(this.modal, post[post.length - 1], this.posts);
     this.modalWindow.initialize();
+  }
+
+  truePostBeforepagination(currentFullPosts) {
+    if (currentFullPosts.length) {
+      const currentId = currentFullPosts[0].id;
+      const currentShortPostContainer = this.storage.getItem(
+        this.storage.keys.postContainer,
+      );
+      const currIdx = currentShortPostContainer.findIndex(
+        (item) => item.id == currentId,
+      );
+
+      const title = currentShortPostContainer[currIdx].title;
+      const body = currentShortPostContainer[currIdx].body;
+      currentFullPosts[0].title = title;
+      currentFullPosts[0].body = body;
+      const currentFullPostContainer = this.storage.getItem(
+        this.storage.keys.fullPostContainer,
+      );
+      this.storage.setItem(
+        this.storage.keys.fullPostContainer,
+        currentFullPostContainer.map((item) => {
+          if (item.id == currentId) {
+            item.title = title;
+            item.body = body;
+          }
+          return item;
+        }),
+      );
+    }
   }
 
   initialize() {

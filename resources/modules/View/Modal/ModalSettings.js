@@ -1,14 +1,15 @@
-import Storage from "../Services/Storage.js";
-import Handler from "../Services/Handler.js";
+import Storage from "../../Services/Storage.js";
+import Handler from "../../Services/Handler.js";
 
 class ModalSettings {
-  constructor(settings, postId, titleTarget, bodyTarget) {
+  constructor(settings, postId, titleTarget, bodyTarget, ...buttons) {
     this.storage = new Storage(sessionStorage);
     this.handler = new Handler();
     this.settings = settings;
     this.postId = postId;
     this.titleTarget = titleTarget;
     this.bodyTarget = bodyTarget;
+    this.buttons = buttons;
   }
 
   render() {
@@ -90,6 +91,16 @@ class ModalSettings {
     this.bodyTarget.disabled = flag;
     this.titleTarget.classList.toggle(`content_editMode`);
     this.bodyTarget.classList.toggle(`content_editMode`);
+
+    if (!flag) {
+      this.buttons.forEach((item) =>
+        item.classList.add(`slider__item_blocked`),
+      );
+    } else {
+      this.buttons.forEach((item) =>
+        item.classList.remove(`slider__item_blocked`),
+      );
+    }
   }
 
   updatePost() {

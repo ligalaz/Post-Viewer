@@ -4,6 +4,7 @@ class Storage {
     this.keys = {
       limit: `limit`,
       total: `total`,
+      pageNumber: `pageNumber`,
       postContainer: `postContainer`,
       fullPostContainer: `fullPostContainer`,
     };
