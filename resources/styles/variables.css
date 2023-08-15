@@ -1,0 +1,46 @@
+:root {
+  --main_font: "Oswald";
+  --title_font: "Bricolage Grotesque";
+  --post_font: "Signika";
+  --tags_font: "Permanent Marker";
+  --logo_font: "Permanent Marker";
+  --sign_font: "Dancing Script";
+
+  --bg_color: #f6fba2;
+  --bg_gradient: linear-gradient(315deg, #f6fba2 0%, #20ded3 74%);
+  --bg-revert_gradient: linear-gradient(315deg, #20ded3 0%, #f6fba2 74%);
+  --bg-title_color: red;
+  --bg-post_color: rgba(255, 255, 255, 0.85);
+  --bg-pagination_color: #deb887;
+  --bg-modal_color: rgba(0, 0, 0, 0.8);
+  --bg-modal_gradient: linear-gradient(315deg, #f6fba2 0%, #20ded3 74%);
+  --bg-modal__title_color: #f6fba2;
+  --bg-modal__drop-down_color: rgba(0, 0, 255, 0.6);
+  --bg-modal__comments_color: #ffe4e1;
+  --bg-modal__btn_color: #f6fba2;
+  --bg-blocked_btn_color: #775e5e15;
+
+  --logo_color: rgba(0, 0, 0, 0.5);
+  --decorate_color: rgba(255, 255, 255, 0.85);
+  --icon_color: #00ffff;
+  --pagination-blocked_color: rgba(105, 105, 105, 0.3);
+  --pagination-active_color: #cd853f;
+  --loader_color: rgba(0, 0, 0, 0.2);
+
+  --main-text_color: rgba(0, 0, 0, 0.5);
+  --main-text__bold_color: rgba(0, 0, 0, 0.7);
+  --title-text_color: white;
+  --pagination-text_color: #cd853f;
+  --modal__btn-text_color: rgba(255, 255, 255, 0.85);
+
+  --logo-border_color: rgba(255, 255, 255, 0.8);
+  --logo-active-border_color: rgba(0, 0, 0, 0.2);
+  --search-border_color: #deb887;
+
+  --search-shadow_color: rgba(154, 147, 140, 0.5);
+  --start-shadow_color: rgba(0, 0, 0, 0.2);
+  --close-shadow_color: rgba(154, 147, 140, 0.9);
+  --modal-shadow_color: rgba(154, 147, 140, 0.5);
+  --comments-shadow_color: rgba(154, 147, 140, 0.5);
+  --shadow-second_color: rgba(255, 255, 255, 1);
+}
